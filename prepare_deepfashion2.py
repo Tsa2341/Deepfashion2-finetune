@@ -293,9 +293,9 @@ def download_and_unzip_from_drive_folder() -> None:
     validation_zip_path = os.path.join(DEST_DIR, "deepfashion2_validation.zip")
 
     download_file_from_google_drive(train_zip_url, train_zip_path)
-    unzip_file(train_zip_path, DEST_DIR, PASSWORD)
-
     download_file_from_google_drive(validation_zip_url, validation_zip_path)
+
+    unzip_file(train_zip_path, DEST_DIR, PASSWORD)
     unzip_file(validation_zip_path, DEST_DIR, PASSWORD)
 
 
