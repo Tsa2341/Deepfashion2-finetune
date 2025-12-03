@@ -9,6 +9,7 @@ import requests
 import zipfile
 import shutil
 import subprocess
+import shlex
 from typing import Optional
 
 from download_weights import download_weights
@@ -221,9 +222,59 @@ def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -
         args += [zip_path, "-d", extract_to]
 
         try:
+            # Try to compute total uncompressed size for reporting speed.
+            total_uncompressed = None
+            try:
+                with zipfile.ZipFile(zip_path, "r") as _z:
+                    total_uncompressed = sum(m.file_size for m in _z.infolist())
+            except Exception:
+                total_uncompressed = None
+
             print(f"Using system 'unzip' for extraction: {unzip_path}")
-            # Run and stream output to the console so user sees progress.
-            subprocess.run(args, check=True)
+            # Build a shell command that prefixes with `time -p` so the kernel
+            # builtin/time prints a simple real/user/sys summary to stderr.
+            # We run via bash so `time` is available as a shell builtin.
+            cmd_parts = [shlex.quote(unzip_path), "-o"]
+            if password:
+                cmd_parts += ["-P", shlex.quote(password)]
+            cmd_parts += [shlex.quote(zip_path), "-d", shlex.quote(extract_to)]
+            cmd_str = "time -p " + " ".join(cmd_parts)
+
+            # Run the command, show unzip output to the user, capture `time` stderr.
+            proc = subprocess.run(
+                cmd_str,
+                shell=True,
+                executable="/bin/bash",
+                stdout=None,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+
+            # Parse `time -p` stderr for the `real` line (format: real <seconds>)
+            elapsed = None
+            for line in (proc.stderr or "").splitlines():
+                line = line.strip()
+                if line.startswith("real "):
+                    try:
+                        elapsed = float(line.split()[1])
+                    except Exception:
+                        elapsed = None
+                    break
+
+            if elapsed is None:
+                # Fallback to measuring locally if parsing failed.
+                # This is unlikely but safe.
+                elapsed = max(0.0, 1e-6)
+
+            if total_uncompressed and elapsed > 0:
+                mib = total_uncompressed / (1024 * 1024)
+                speed = mib / elapsed
+                print(
+                    f"Extracted {os.path.basename(zip_path)}: {mib:6.2f} MiB in {elapsed:.2f}s @ {speed:5.2f} MiB/s (system unzip)"
+                )
+            else:
+                print(f"Extraction completed in {elapsed:.2f}s (system unzip)")
             return
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             print(f"system unzip failed ({e}), falling back to Python extraction")
