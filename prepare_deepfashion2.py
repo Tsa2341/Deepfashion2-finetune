@@ -11,9 +11,12 @@ import shutil
 import subprocess
 import shlex
 from typing import Optional
+from pathlib import Path
 
 from download_weights import download_weights
 from deepfashion2_to_coco import convert_deepfashion2_to_coco
+
+DATASET_DEST_DIR = Path(__file__).resolve().parent / "datasets" / "deepfashion2"
 
 
 def download_file_from_google_drive(url: str, dest_path: str) -> None:
@@ -357,7 +360,7 @@ def download_and_unzip_from_drive_folder() -> None:
     train_zip_url = "https://drive.google.com/file/d/1BliPI6hJgk5mJHR7dJwVb-3HaprXxoFg/view?usp=sharing"
     validation_zip_url = "https://drive.google.com/file/d/1DlNkwZRtlbExwVg4_juAlmetOHD2udU-/view?usp=sharing"
 
-    DEST_DIR = "./datasets/deepfashion2"
+    DEST_DIR = DATASET_DEST_DIR
     PASSWORD = "2019Deepfashion2**"
 
     os.makedirs(DEST_DIR, exist_ok=True)
@@ -385,15 +388,15 @@ def main():
     download_and_unzip_from_drive_folder()
 
     # Convert annotations to COCO format
-    DEST_DIR = "./datasets/deepfashion2"
-    train_annos_dir = os.path.join(DEST_DIR, "train/annos")
-    train_images_dir = os.path.join(DEST_DIR, "train/image")
-    train_json = os.path.join(DEST_DIR, "deepfashion2_train.json")
-    val_annos_dir = os.path.join(DEST_DIR, "validation/annos")
-    val_images_dir = os.path.join(DEST_DIR, "validation/image")
-    val_json = os.path.join(DEST_DIR, "deepfashion2_val.json")
-    convert_deepfashion2_to_coco(train_annos_dir, train_images_dir, train_json)
-    convert_deepfashion2_to_coco(val_annos_dir, val_images_dir, val_json)
+    # DEST_DIR = DATASET_DEST_DIR
+    # train_annos_dir = os.path.join(DEST_DIR, "train/annos")
+    # train_images_dir = os.path.join(DEST_DIR, "train/image")
+    # train_json = os.path.join(DEST_DIR, "deepfashion2_train.json")
+    # val_annos_dir = os.path.join(DEST_DIR, "validation/annos")
+    # val_images_dir = os.path.join(DEST_DIR, "validation/image")
+    # val_json = os.path.join(DEST_DIR, "deepfashion2_val.json")
+    # convert_deepfashion2_to_coco(train_annos_dir, train_images_dir, train_json)
+    # convert_deepfashion2_to_coco(val_annos_dir, val_images_dir, val_json)
 
 
 if __name__ == "__main__":
