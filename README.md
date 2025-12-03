@@ -30,7 +30,7 @@ python -m pip install torch torchvision --index-url https://download.pytorch.org
 Install the project's Python requirements (we recommend installing detectron2 with the correct CUDA build as described below):
 
 ```bash
-python -m pip install -r requirements-gpu.txt
+python -m pip install -r requirements.txt
 ```
 
 4. Install Detectron2 (CUDA 13)
@@ -38,7 +38,7 @@ python -m pip install -r requirements-gpu.txt
 Detectron2 wheels are published per-CUDA and PyTorch version. See https://github.com/facebookresearch/detectron2 for wheel links. Example:
 
 ```bash
-# Replace {url} with the wheel URL that matches your torch+cuda version
+# Replace {url} with the wheel URL that matches your torch+cuda version ex: git+https://github.com/facebookresearch/detectron2.git
 python -m pip install {detectron2_wheel_url}
 ```
 
@@ -73,7 +73,7 @@ cd deepfashion2-finetune
 python3 prepare_deepfashion2.py
 ```
 
-The script will place prepared files under `datasets/deepfashion2/` (including COCO JSONs). If you prefer to run steps manually, the `preparations/deepfashion2_to_coco.py` converter is available.
+The script will place prepared files under `datasets/deepfashion2/` (COCO JSONs will be under `datasets/coco_format/`). If you prefer to run steps manually, the `deepfashion2_to_coco.py` converter is available.
 
 9. Run a short benchmark (recommended to estimate images/sec)
 
@@ -82,12 +82,12 @@ You can run a short benchmark using the training script included here. Example (
 ```bash
 cd deepfashion2-finetune
 python3 train_deepfashion2_mask2former_gpu.py \
-  --config-file configs/maskformer2_swin_small_bs16_50ep.yaml \
-  --train-json datasets/deepfashion2/deepfashion2_train_coco.json \
+  --config-file configs/maskformer2_swin_base_384_bs16_50ep.yaml \
+  --train-json datasets/coco_format/deepfashion2_train.json \
   --train-imgs datasets/deepfashion2/train/image/ \
-  --val-json datasets/deepfashion2/deepfashion2_val_coco.json \
+  --val-json datasets/coco_format/deepfashion2_val.json \
   --val-imgs datasets/deepfashion2/validation/image/ \
-  --output-dir output/deepfashion2_swin_small_bs16 \
+  --output-dir output/maskformer2_swin_base_384_bs16 \
   --device cuda \
   --epochs 1 \
   --batch-size 1 \
@@ -102,12 +102,12 @@ Use the same script for full training; increase `--epochs`, tune `--batch-size`,
 ```bash
 cd deepfashion2-finetune
 python3 train_deepfashion2_mask2former_gpu.py \
-  --config-file configs/mask2former2_swin_large.yaml \
-  --train-json datasets/deepfashion2/deepfashion2_train_coco.json \
+  --config-file configs/maskformer2_swin_base_384_bs16_50ep.yaml \
+  --train-json datasets/coco_format/deepfashion2_train.json \
   --train-imgs datasets/deepfashion2/train/image/ \
-  --val-json datasets/deepfashion2/deepfashion2_val_coco.json \
+  --val-json datasets/coco_format/deepfashion2_val.json \
   --val-imgs datasets/deepfashion2/validation/image/ \
-  --output-dir output/deepfashion2_swin_large \
+  --output-dir output/maskformer2_swin_base_384_bs16 \
   --device cuda \
   --epochs 50 \
   --batch-size 1 \
