@@ -45,4 +45,4 @@ Thumbs.db
 *.db
 
 # Generated or downloaded Files/Folders
-datasets/**
+datasets/deepfashion2/**
