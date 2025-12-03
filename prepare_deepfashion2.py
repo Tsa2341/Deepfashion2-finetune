@@ -7,6 +7,8 @@ import re
 import time
 import requests
 import zipfile
+import shutil
+import subprocess
 from typing import Optional
 
 from download_weights import download_weights
@@ -206,8 +208,28 @@ def download_file_from_google_drive(url: str, dest_path: str) -> None:
 
 
 def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -> None:
-    # Extract with progress reporting. We compute total uncompressed size
-    # and stream each member to disk while updating a progress line.
+    # Prefer using the system `unzip` utility for much faster extraction when
+    # available. Fall back to the Python `zipfile` streaming extraction on
+    # failure (or when `unzip` is not installed). The system `unzip` is
+    # typically *much* faster (C implementation, optimized I/O).
+    unzip_path = shutil.which("unzip")
+    if unzip_path:
+        args = [unzip_path, "-o"]
+        if password:
+            # `unzip -P` accepts the password on the command line.
+            args += ["-P", password]
+        args += [zip_path, "-d", extract_to]
+
+        try:
+            print(f"Using system 'unzip' for extraction: {unzip_path}")
+            # Run and stream output to the console so user sees progress.
+            subprocess.run(args, check=True)
+            return
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            print(f"system unzip failed ({e}), falling back to Python extraction")
+
+    # Extract with progress reporting in Python as a fallback. We compute total
+    # uncompressed size and stream each member to disk while updating a progress line.
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         if password:
             pwd = password.encode()
