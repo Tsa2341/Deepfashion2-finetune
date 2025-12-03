@@ -281,8 +281,8 @@ def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -
 
 
 def download_and_unzip_from_drive_folder() -> None:
-    train_zip_url = "https://drive.google.com/file/d/1i9ijLrrYi5lnR0iPhd-lOsxwYzslKdGZ/view?usp=sharing"
-    validation_zip_url = "https://drive.google.com/file/d/1i9ijLrrYi5lnR0iPhd-lOsxwYzslKdGZ/view?usp=sharing"
+    train_zip_url = "https://drive.google.com/file/d/1BliPI6hJgk5mJHR7dJwVb-3HaprXxoFg/view?usp=sharing"
+    validation_zip_url = "https://drive.google.com/file/d/1DlNkwZRtlbExwVg4_juAlmetOHD2udU-/view?usp=sharing"
 
     DEST_DIR = "./datasets/deepfashion2"
     PASSWORD = "2019Deepfashion2**"
