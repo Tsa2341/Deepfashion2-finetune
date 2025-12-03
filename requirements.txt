@@ -1,0 +1,23 @@
+requests
+opencv-python
+pycocotools
+yacs
+timm
+fvcore
+iopath
+scipy
+pyyaml
+termcolor
+numpy
+matplotlib
+tensorboard
+tqdm
+
+# NOTE: Install PyTorch with the wheel that matches CUDA 13 from https://pytorch.org/get-started/locally/
+# Example (replace with exact command from pytorch.org):
+#   python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu13x
+
+
+# Mask2Former / Detectron2 dependencies (install detectron2 separately matching torch+cuda)
+# detectron2
+# python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'

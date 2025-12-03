@@ -1,0 +1,48 @@
+# Git ignore for deepfashion2-finetune workspace
+# Ignore Python artifacts, virtualenvs, large data, weights and outputs
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Packages
+dist/
+build/
+*.egg-info/
+
+# Model checkpoints and binaries
+checkpoints/
+output/
+outputs/
+*.pth
+*.pt
+*.ckpt
+
+# Logs and runtime
+*.log
+training_log.txt
+logs/
+tmp/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Misc
+*.sqlite3
+*.db
+
+# Generated or downloaded Files/Folders
+datasets/**
