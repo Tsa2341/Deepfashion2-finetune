@@ -233,7 +233,9 @@ def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -
             except Exception:
                 total_uncompressed = None
 
-            print(f"Using system 'unzip' for extraction: {unzip_path}")
+            print(
+                f"Started extraction of {os.path.basename(zip_path)} using system 'unzip' ({unzip_path})"
+            )
             # Build a shell command that prefixes with `time -p` so the kernel
             # builtin/time prints a simple real/user/sys summary to stderr.
             # We run via bash so `time` is available as a shell builtin.
@@ -244,11 +246,15 @@ def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -
             cmd_str = "time -p " + " ".join(cmd_parts)
 
             # Run the command, show unzip output to the user, capture `time` stderr.
+            # Suppress per-file 'inflating' output from unzip by redirecting
+            # its stdout to DEVNULL. We still capture `time -p` output from
+            # stderr to detect failures, but only show a concise start/end
+            # message to the user.
             proc = subprocess.run(
                 cmd_str,
                 shell=True,
                 executable="/bin/bash",
-                stdout=None,
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 text=True,
                 check=True,
@@ -265,19 +271,8 @@ def unzip_file(zip_path: str, extract_to: str, password: Optional[str] = None) -
                         elapsed = None
                     break
 
-            if elapsed is None:
-                # Fallback to measuring locally if parsing failed.
-                # This is unlikely but safe.
-                elapsed = max(0.0, 1e-6)
-
-            if total_uncompressed and elapsed > 0:
-                mib = total_uncompressed / (1024 * 1024)
-                speed = mib / elapsed
-                print(
-                    f"Extracted {os.path.basename(zip_path)}: {mib:6.2f} MiB in {elapsed:.2f}s @ {speed:5.2f} MiB/s (system unzip)"
-                )
-            else:
-                print(f"Extraction completed in {elapsed:.2f}s (system unzip)")
+            # Print only a concise finished message (no per-file output).
+            print(f"Finished extraction of {os.path.basename(zip_path)} (system unzip)")
             return
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             print(f"system unzip failed ({e}), falling back to Python extraction")
@@ -397,6 +392,24 @@ def main():
     # val_json = os.path.join(DEST_DIR, "deepfashion2_val.json")
     # convert_deepfashion2_to_coco(train_annos_dir, train_images_dir, train_json)
     # convert_deepfashion2_to_coco(val_annos_dir, val_images_dir, val_json)
+
+    # Clone Mask2Former repository if not already present
+    mask2former_dir = os.path.join(os.path.dirname(__file__), "Mask2Former")
+    if not os.path.exists(mask2former_dir):
+        git_url = "https://github.com/facebookresearch/Mask2Former.git"
+        subprocess.run(
+            ["git", "clone", git_url, mask2former_dir],
+            check=True,
+        )
+        print(f"Cloned Mask2Former repository to {mask2former_dir}")
+
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-e", mask2former_dir],
+            check=True,
+        )
+        print(f"Installed Mask2Former from {mask2former_dir}")
+    else:
+        print(f"Mask2Former repository already exists at {mask2former_dir}")
 
 
 if __name__ == "__main__":

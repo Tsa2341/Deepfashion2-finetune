@@ -46,3 +46,4 @@ Thumbs.db
 
 # Generated or downloaded Files/Folders
 datasets/deepfashion2/**
+Mask2Former/**
