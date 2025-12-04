@@ -16,7 +16,11 @@ from pathlib import Path
 from download_weights import download_weights
 from deepfashion2_to_coco import convert_deepfashion2_to_coco
 
-DATASET_DEST_DIR = Path(__file__).resolve().parent / "datasets" / "deepfashion2"
+DATASET_DEST_DIR = (
+    (Path(__file__).resolve().parent / "datasets" / "deepfashion2")
+    .absolute()
+    .as_posix()
+)
 
 
 def download_file_from_google_drive(url: str, dest_path: str) -> None:
