@@ -1,7 +1,13 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.dirname(__file__) / "Mask2Former")
+
+print("sys.path:", sys.path)
+print(
+    "------------------------------------------------------------------------------------------"
+)
 
 import re
 import time
@@ -408,7 +414,13 @@ def main():
         print(f"Cloned Mask2Former repository to {mask2former_dir}")
 
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-e", mask2former_dir],
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                mask2former_dir + "/requirements.txt",
+            ],
             check=True,
         )
         print(f"Installed Mask2Former from {mask2former_dir}")
