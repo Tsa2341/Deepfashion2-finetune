@@ -89,6 +89,7 @@ python3 train_deepfashion2_mask2former_gpu.py \
   --val-imgs datasets/deepfashion2/validation/image/ \
   --output-dir output/maskformer2_swin_base_384_bs16 \
   --device cuda \
+  --amp \
   --epochs 1 \
   --batch-size 1 \
   --weights weights/swin_base_patch4_window12_384.pth \
@@ -109,6 +110,7 @@ python3 train_deepfashion2_mask2former_gpu.py \
   --val-imgs datasets/deepfashion2/validation/image/ \
   --output-dir output/maskformer2_swin_base_384_bs16 \
   --device cuda \
+  --amp \
   --epochs 50 \
   --batch-size 1 \
   --weights weights/swin_base_patch4_window12_384.pth \
