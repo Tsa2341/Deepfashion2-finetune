@@ -82,7 +82,7 @@ You can run a short benchmark using the training script included here. Example (
 ```bash
 cd deepfashion2-finetune
 python3 train_deepfashion2_mask2former_gpu.py \
-  --config-file configs/maskformer2_swin_base_384_bs16_50ep.yaml \
+  --config-file Mask2Former/configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml \
   --train-json datasets/coco_format/deepfashion2_train.json \
   --train-imgs datasets/deepfashion2/train/image/ \
   --val-json datasets/coco_format/deepfashion2_val.json \
@@ -92,7 +92,7 @@ python3 train_deepfashion2_mask2former_gpu.py \
   --amp \
   --epochs 1 \
   --batch-size 1 \
-  --weights weights/swin_base_patch4_window12_384.pth \
+  --weights weights/swin_base_patch4_window12_384.pkl \
   --num-workers 4 | tee training_log.txt
 ```
 
@@ -103,7 +103,7 @@ Use the same script for full training; increase `--epochs`, tune `--batch-size`,
 ```bash
 cd deepfashion2-finetune
 python3 train_deepfashion2_mask2former_gpu.py \
-  --config-file configs/maskformer2_swin_base_384_bs16_50ep.yaml \
+  --config-file Mask2Former/configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml \
   --train-json datasets/coco_format/deepfashion2_train.json \
   --train-imgs datasets/deepfashion2/train/image/ \
   --val-json datasets/coco_format/deepfashion2_val.json \
@@ -113,7 +113,7 @@ python3 train_deepfashion2_mask2former_gpu.py \
   --amp \
   --epochs 50 \
   --batch-size 1 \
-  --weights weights/swin_base_patch4_window12_384.pth \
+  --weights weights/swin_base_patch4_window12_384.pkl \
   --num-workers 8 | tee training_log.txt
 ```
 

@@ -19,12 +19,15 @@ INPUT:
   FORMAT: "RGB"
 """
 
-if __name__ == "__main__":
-    input = sys.argv[1]
 
+def swin_pretrained_to_d2(input: str, output: str):
     obj = torch.load(input, map_location="cpu")["model"]
 
     res = {"model": obj, "__author__": "third_party", "matching_heuristics": True}
 
-    with open(sys.argv[2], "wb") as f:
+    with open(output, "wb") as f:
         pkl.dump(res, f)
+
+
+if __name__ == "__main__":
+    swin_pretrained_to_d2(sys.argv[1], sys.argv[2])

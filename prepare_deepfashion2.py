@@ -1,5 +1,17 @@
 import sys
 import os
+from pathlib import Path
+
+# Get the Mask2Former root directory and ensure it is on sys.path.
+_root_path = Path.resolve()
+_mask2former_root = Path.joinpath(_root_path, "Mask2Former")
+
+
+if Path.is_dir(_mask2former_root) and _mask2former_root not in sys.path:
+    sys.path.insert(0, _mask2former_root.absolute().as_posix())
+if Path.is_dir(_root_path) and _root_path not in sys.path:
+    sys.path.insert(0, _root_path.absolute().as_posix())
+
 
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.dirname(__file__) + "/Mask2Former")
@@ -8,6 +20,7 @@ print("sys.path:", sys.path)
 print(
     "------------------------------------------------------------------------------------------"
 )
+
 
 import re
 import time
@@ -21,9 +34,10 @@ from pathlib import Path
 
 from download_weights import download_weights
 from deepfashion2_to_coco import convert_deepfashion2_to_coco
+from Mask2Former.tools.convert_pretrained_swin_model_to_d2 import swin_pretrained_to_d2
 
 DATASET_DEST_DIR = (
-    (Path(__file__).parent / "datasets" / "deepfashion2").absolute().as_posix()
+    Path.joinpath(Path.resolve(), "datasets", "deepfashion2").absolute().as_posix()
 )
 print(f"Dataset dir: {DATASET_DEST_DIR}")
 
@@ -396,43 +410,55 @@ def main():
     weights_dir_small = os.path.join(os.path.dirname(__file__), "weights")
     download_weights(weights_url_small, weights_dir_small)
 
+    # Convert swin weights to D2 format
+    print("Converting Swin pretrained weights to Detectron2 format...")
+    swin_base_p4_w12_384_pth = os.path.join(
+        weights_dir, "swin_base_patch4_window12_384.pth"
+    )
+    swin_base_p4_w12_384_d2pkl = os.path.join(
+        weights_dir, "swin_base_patch4_window12_384.pkl"
+    )
+    if os.path.exists(swin_base_p4_w12_384_d2pkl):
+        print(
+            f"Swin base weights in D2 format already exist, skipping conversion: {swin_base_p4_w12_384_d2pkl}"
+        )
+    else:
+        swin_pretrained_to_d2(swin_base_p4_w12_384_pth, swin_base_p4_w12_384_d2pkl)
+    swin_small_p4_w7_224_pth = os.path.join(
+        weights_dir_small, "swin_small_patch4_window7_224.pth"
+    )
+    swin_small_p4_w7_224_d2pkl = os.path.join(
+        weights_dir_small, "swin_small_patch4_window7_224.pkl"
+    )
+    if os.path.exists(swin_small_p4_w7_224_d2pkl):
+        print(
+            f"Swin small weights in D2 format already exist, skipping conversion: {swin_small_p4_w7_224_d2pkl}"
+        )
+    else:
+        swin_pretrained_to_d2(swin_small_p4_w7_224_pth, swin_small_p4_w7_224_d2pkl)
+
     # Download DeepFashion2 dataset from Google Drive folder and unzip it
     download_and_unzip_from_drive_folder()
 
     # Convert annotations to COCO format
-    # DEST_DIR = DATASET_DEST_DIR
-    # train_annos_dir = os.path.join(DEST_DIR, "train/annos")
-    # train_images_dir = os.path.join(DEST_DIR, "train/image")
-    # train_json = os.path.join(DEST_DIR, "deepfashion2_train.json")
-    # val_annos_dir = os.path.join(DEST_DIR, "validation/annos")
-    # val_images_dir = os.path.join(DEST_DIR, "validation/image")
-    # val_json = os.path.join(DEST_DIR, "deepfashion2_val.json")
-    # convert_deepfashion2_to_coco(train_annos_dir, train_images_dir, train_json)
-    # convert_deepfashion2_to_coco(val_annos_dir, val_images_dir, val_json)
-
-    # Clone Mask2Former repository if not already present
-    mask2former_dir = os.path.join(os.path.dirname(__file__), "Mask2Former")
-    if not os.path.exists(mask2former_dir):
-        git_url = "https://github.com/facebookresearch/Mask2Former.git"
-        subprocess.run(
-            ["git", "clone", git_url, mask2former_dir],
-            check=True,
-        )
-        print(f"Cloned Mask2Former repository to {mask2former_dir}")
-
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                mask2former_dir + "/requirements.txt",
-            ],
-            check=True,
-        )
-        print(f"Installed Mask2Former from {mask2former_dir}")
+    DEST_DIR = DATASET_DEST_DIR
+    train_annos_dir = os.path.join(DEST_DIR, "train/annos")
+    train_images_dir = os.path.join(DEST_DIR, "train/image")
+    train_json = os.path.join(DEST_DIR, "deepfashion2_train.json")
+    val_annos_dir = os.path.join(DEST_DIR, "validation/annos")
+    val_images_dir = os.path.join(DEST_DIR, "validation/image")
+    val_json = os.path.join(DEST_DIR, "deepfashion2_val.json")
+    if os.path.exists(train_json):
+        print(f"Train JSON already exists, skipping conversion: {train_json}")
     else:
-        print(f"Mask2Former repository already exists at {mask2former_dir}")
+        print("Converting training annotations to COCO format...")
+        convert_deepfashion2_to_coco(train_annos_dir, train_images_dir, train_json)
+
+    if os.path.exists(val_json):
+        print(f"Validation JSON already exists, skipping conversion: {val_json}")
+    else:
+        print("Converting validation annotations to COCO format...")
+        convert_deepfashion2_to_coco(val_annos_dir, val_images_dir, val_json)
 
 
 if __name__ == "__main__":

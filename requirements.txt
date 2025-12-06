@@ -12,6 +12,12 @@ numpy
 matplotlib
 tensorboard
 tqdm
+cython
+shapely
+h5py
+submitit
+scikit-image
+
 
 # NOTE: Install PyTorch with the wheel that matches CUDA 13 from https://pytorch.org/get-started/locally/
 # Example (replace with exact command from pytorch.org):

@@ -106,7 +106,9 @@ def load_coco_panoptic_json(json_file, image_dir, gt_dir, semseg_dir, meta):
         # different extension, and images have extension ".jpg" for COCO. Need
         # to make image extension a user-provided argument if we extend this
         # function to support other COCO-like datasets.
-        image_file = os.path.join(image_dir, os.path.splitext(ann["file_name"])[0] + ".jpg")
+        image_file = os.path.join(
+            image_dir, os.path.splitext(ann["file_name"])[0] + ".jpg"
+        )
         label_file = os.path.join(gt_dir, ann["file_name"])
         sem_label_file = os.path.join(semseg_dir, ann["file_name"])
         segments_info = [_convert_category_id(x, meta) for x in ann["segments_info"]]
@@ -127,7 +129,13 @@ def load_coco_panoptic_json(json_file, image_dir, gt_dir, semseg_dir, meta):
 
 
 def register_coco_panoptic_annos_sem_seg(
-    name, metadata, image_root, panoptic_root, panoptic_json, sem_seg_root, instances_json
+    name,
+    metadata,
+    image_root,
+    panoptic_root,
+    panoptic_json,
+    sem_seg_root,
+    instances_json,
 ):
     panoptic_name = name
     delattr(MetadataCatalog.get(panoptic_name), "thing_classes")
@@ -140,21 +148,24 @@ def register_coco_panoptic_annos_sem_seg(
 
     # the name is "coco_2017_train_panoptic_with_sem_seg" and "coco_2017_val_panoptic_with_sem_seg"
     semantic_name = name + "_with_sem_seg"
-    DatasetCatalog.register(
-        semantic_name,
-        lambda: load_coco_panoptic_json(panoptic_json, image_root, panoptic_root, sem_seg_root, metadata),
-    )
-    MetadataCatalog.get(semantic_name).set(
-        sem_seg_root=sem_seg_root,
-        panoptic_root=panoptic_root,
-        image_root=image_root,
-        panoptic_json=panoptic_json,
-        json_file=instances_json,
-        evaluator_type="coco_panoptic_seg",
-        ignore_label=255,
-        label_divisor=1000,
-        **metadata,
-    )
+    if semantic_name not in DatasetCatalog.list():
+        DatasetCatalog.register(
+            semantic_name,
+            lambda: load_coco_panoptic_json(
+                panoptic_json, image_root, panoptic_root, sem_seg_root, metadata
+            ),
+        )
+        MetadataCatalog.get(semantic_name).set(
+            sem_seg_root=sem_seg_root,
+            panoptic_root=panoptic_root,
+            image_root=image_root,
+            panoptic_json=panoptic_json,
+            json_file=instances_json,
+            evaluator_type="coco_panoptic_seg",
+            ignore_label=255,
+            label_divisor=1000,
+            **metadata,
+        )
 
 
 def register_all_coco_panoptic_annos_sem_seg(root):
@@ -178,4 +189,6 @@ def register_all_coco_panoptic_annos_sem_seg(root):
 
 
 _root = os.getenv("DETECTRON2_DATASETS", "datasets")
-register_all_coco_panoptic_annos_sem_seg(_root)
+# Auto-registration is opt-in. Set `MASK2FORMER_AUTO_REGISTER=1` to enable.
+if os.getenv("MASK2FORMER_AUTO_REGISTER", "0") == "1":
+    register_all_coco_panoptic_annos_sem_seg(_root)
