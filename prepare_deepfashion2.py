@@ -2,7 +2,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.dirname(__file__) / "Mask2Former")
+sys.path.append(os.path.dirname(__file__) + "/Mask2Former")
 
 print("sys.path:", sys.path)
 print(
@@ -23,10 +23,9 @@ from download_weights import download_weights
 from deepfashion2_to_coco import convert_deepfashion2_to_coco
 
 DATASET_DEST_DIR = (
-    (Path(__file__).resolve().parent / "datasets" / "deepfashion2")
-    .absolute()
-    .as_posix()
+    (Path(__file__).parent / "datasets" / "deepfashion2").absolute().as_posix()
 )
+print(f"Dataset dir: {DATASET_DEST_DIR}")
 
 
 def download_file_from_google_drive(url: str, dest_path: str) -> None:
@@ -382,12 +381,20 @@ def download_and_unzip_from_drive_folder() -> None:
 
 def main():
     # Ensure pretrained weights are available
+    # Base weights
     weights_url = (
         "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/"
         "swin_base_patch4_window12_384.pth"
     )
     weights_dir = os.path.join(os.path.dirname(__file__), "weights")
     download_weights(weights_url, weights_dir)
+    # small weights
+    weights_url_small = (
+        "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/"
+        "swin_small_patch4_window7_224.pth"
+    )
+    weights_dir_small = os.path.join(os.path.dirname(__file__), "weights")
+    download_weights(weights_url_small, weights_dir_small)
 
     # Download DeepFashion2 dataset from Google Drive folder and unzip it
     download_and_unzip_from_drive_folder()

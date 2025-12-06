@@ -1,2 +1,2 @@
-datasets/coco_format/deepfashion2_val.json filter=lfs diff=lfs merge=lfs -text
-datasets/coco_format/deepfashion2_train.json filter=lfs diff=lfs merge=lfs -text
+# datasets/coco_format/deepfashion2_val.json filter=lfs diff=lfs merge=lfs -text
+# datasets/coco_format/deepfashion2_train.json filter=lfs diff=lfs merge=lfs -text
